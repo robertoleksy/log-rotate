@@ -40,22 +40,13 @@ void cLogRotate::rotate()
 
 	// gz files
 	std::vector<std::string> gz_files_to_rotate = getFileVector(mGZFileRegex);
-	for (auto file : gz_files_to_rotate)
-	{
-		std::cout << "gz file " << file << std::endl;
-	}
-
 	std::sort(gz_files_to_rotate.begin(), gz_files_to_rotate.end(), [this](const std::string &a, const std::string &b)
 			{
 				std::string aSuffix(a);
 				std::string bSuffix(b);
 				aSuffix.erase(aSuffix.end() - 3, aSuffix.end());
 				bSuffix.erase(bSuffix.end() - 3, bSuffix.end());
-				//std::cout << "a " << a << std::endl;
-				std::cout << "aSuffix " << getSuffix(aSuffix) << std::endl;
-				//std::cout << "b " << b << std::endl;
-				std::cout << "bSuffix " << getSuffix(bSuffix) << std::endl;
-				return std::stoi(getSuffix(aSuffix)) < std::stoi(getSuffix(aSuffix));
+				return std::stoi(getSuffix(aSuffix)) < std::stoi(getSuffix(bSuffix));
 			});
 	for (auto file : gz_files_to_rotate)
 	{
