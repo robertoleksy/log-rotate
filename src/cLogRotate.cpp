@@ -24,25 +24,11 @@ cLogRotate::~cLogRotate()
 void cLogRotate::rotate()
 {
 	std::vector<std::string> files_to_rotate = getFileVector(mRegexFileName);
-	std::sort(files_to_rotate.begin(), files_to_rotate.end(), [](const std::string &a, const std::string &b)
+	std::sort(files_to_rotate.begin(), files_to_rotate.end(), [this](const std::string &a, const std::string &b)
 			{
-				std::string a_suffix, b_suffix;
-				auto it = a.end() - 1;
-				while (*it != '.')
-				{
-					a_suffix.insert(a_suffix.begin(), *it);
-					it--;
-				}
-
-				it = b.end() - 1;
-				while (*it != '.')
-				{
-					b_suffix.insert(b_suffix.begin(), *it);
-					it--;
-				}
-				return std::stoi(a_suffix) < std::stoi(b_suffix);
+				return std::stoi(getSuffix(a)) < std::stoi(getSuffix(b));
 			});
-	for (auto file : files_to_rotate)
+	for (auto file : files_to_rotate) // XXX
 	{
 		std::cout << "file " << file << std::endl;
 	}
@@ -80,3 +66,18 @@ std::vector<std::string> cLogRotate::getFileVector(const std::string &regex_str)
 
 	return fileVector;
 }
+
+
+std::string cLogRotate::getSuffix(const std::string &str)
+{
+	std::string suffix;
+	auto it = str.end() - 1;
+	while (*it != '.')
+	{
+		suffix.insert(suffix.begin(), *it);
+		it--;
+	}
+
+	return suffix;
+}
+

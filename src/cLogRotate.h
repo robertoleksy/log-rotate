@@ -36,6 +36,7 @@ private:
 	std::string mRegexFileName; // http://www.boost.org/doc/libs/1_58_0/libs/regex/doc/html/boost_regex/syntax/basic_extended.html
 
 	boost::uintmax_t getFreeSpace();
+	std::string getSuffix(const std::string &str);
 };
 
 #endif /* CLOGROTATE_H_ */
