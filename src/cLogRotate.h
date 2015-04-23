@@ -37,6 +37,15 @@ private:
 
 	boost::uintmax_t getFreeSpace();
 	std::string getSuffix(const std::string &str);
+	//std::string getPrefix(const std::string &str);
+
+	struct sFileName
+	{
+		std::string prefix;
+		std::string suffix;
+	};
+
+	sFileName convertName(const std::string &fileName);
 };
 
 #endif /* CLOGROTATE_H_ */

@@ -28,9 +28,12 @@ void cLogRotate::rotate()
 			{
 				return std::stoi(getSuffix(a)) < std::stoi(getSuffix(b));
 			});
+
 	for (auto file : files_to_rotate) // XXX
 	{
-		std::cout << "file " << file << std::endl;
+		sFileName sfn = convertName(file);
+
+		std::cout << "file " << file << " => " << sfn.prefix << std::stoi(sfn.suffix) + 1 << std::endl;
 	}
 }
 
@@ -67,7 +70,6 @@ std::vector<std::string> cLogRotate::getFileVector(const std::string &regex_str)
 	return fileVector;
 }
 
-
 std::string cLogRotate::getSuffix(const std::string &str)
 {
 	std::string suffix;
@@ -81,3 +83,10 @@ std::string cLogRotate::getSuffix(const std::string &str)
 	return suffix;
 }
 
+cLogRotate::sFileName cLogRotate::convertName(const std::string &fileName)
+{
+	sFileName sName;
+	sName.suffix = getSuffix(fileName);
+	sName.prefix = fileName.substr(0, fileName.size() - sName.suffix.size());
+	return sName;
+}
