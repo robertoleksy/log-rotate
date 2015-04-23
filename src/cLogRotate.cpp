@@ -21,6 +21,38 @@ cLogRotate::~cLogRotate()
 {
 }
 
+void cLogRotate::rotate()
+{
+	std::vector<std::string> files_to_rotate = getFileVector(mRegexFileName);
+	std::sort(files_to_rotate.begin(), files_to_rotate.end(), [](const std::string &a, const std::string &b)
+			{
+				std::string a_suffix, b_suffix;
+				auto it = a.end() - 1;
+				while (*it != '.')
+				{
+					a_suffix.insert(a_suffix.begin(), *it);
+					it--;
+				}
+
+				it = b.end() - 1;
+				while (*it != '.')
+				{
+					b_suffix.insert(b_suffix.begin(), *it);
+					it--;
+				}
+				return std::stoi(a_suffix) < std::stoi(b_suffix);
+			});
+	for (auto file : files_to_rotate)
+	{
+		std::cout << "file " << file << std::endl;
+	}
+}
+
+void cLogRotate::setFileRegexName(const std::string &regexName)
+{
+	mRegexFileName = regexName;
+}
+
 boost::uintmax_t cLogRotate::getFreeSpace()
 {
 	fs::space_info space_inf = fs::space(mPath);

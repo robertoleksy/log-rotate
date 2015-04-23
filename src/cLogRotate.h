@@ -11,6 +11,7 @@
 #include <vector>
 #include <string>
 #include <chrono>
+#include <algorithm>
 #include <boost/filesystem.hpp>
 #include <boost/regex.hpp> // http://stackoverflow.com/questions/13899276/using-regex-under-c11
 
@@ -23,15 +24,18 @@ public:
 	virtual ~cLogRotate();
 
 	void rotate();
-	std::vector<std::string> getFileVector(const std::string &regex_str);
+	void setFileRegexName(const std::string &regexName);
+	std::vector<std::string> getFileVector(const std::string &regex_str); // TODO private
 private:
 	std::vector<std::string> mFileVector;
 	unsigned int mMaxLogFiles;
 	unsigned int mMaxGZFiles;
 	boost::uintmax_t mMinDiscFreeSpace;
 	fs::path mPath;
-	boost::uintmax_t getFreeSpace();
 	std::chrono::hours mMaxLogStorageTime;
+	std::string mRegexFileName; // http://www.boost.org/doc/libs/1_58_0/libs/regex/doc/html/boost_regex/syntax/basic_extended.html
+
+	boost::uintmax_t getFreeSpace();
 };
 
 #endif /* CLOGROTATE_H_ */
