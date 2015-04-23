@@ -25,18 +25,6 @@ cLogRotate::~cLogRotate()
 
 void cLogRotate::rotate()
 {
-	std::vector<std::string> files_to_rotate = getFileVector(mFileRegex);
-	std::sort(files_to_rotate.begin(), files_to_rotate.end(), [this](const std::string &a, const std::string &b)
-			{
-				return std::stoi(getSuffix(a)) < std::stoi(getSuffix(b));
-			});
-
-	for (auto file : files_to_rotate)
-	{
-		sFileName sfn = convertName(file);
-		std::cout << "file " << file << " => " << sfn.prefix << std::stoi(sfn.suffix) + 1 << std::endl; // XXX
-	}
-
 	// gz files
 	std::vector<std::string> gz_files_to_rotate = getFileVector(mGZFileRegex);
 	std::sort(gz_files_to_rotate.begin(), gz_files_to_rotate.end(), [this](const std::string &a, const std::string &b)
@@ -53,6 +41,20 @@ void cLogRotate::rotate()
 		//std::cout << "gz file prefix " << sfn.prefix << " suffix " << sfn.suffix << std::endl; // XXX
 		std::cout << "gz file " << file << " => " << sfn.prefix << std::stoi(sfn.suffix) + 1 << ".gz" << std::endl; // XXX
 	}
+
+	// normal logs
+	std::vector<std::string> files_to_rotate = getFileVector(mFileRegex);
+	std::sort(files_to_rotate.begin(), files_to_rotate.end(), [this](const std::string &a, const std::string &b)
+			{
+				return std::stoi(getSuffix(a)) < std::stoi(getSuffix(b));
+			});
+
+	for (auto file : files_to_rotate)
+	{
+		sFileName sfn = convertName(file);
+		std::cout << "file " << file << " => " << sfn.prefix << std::stoi(sfn.suffix) + 1 << std::endl; // XXX
+	}
+
 }
 
 boost::uintmax_t cLogRotate::getFreeSpace()
