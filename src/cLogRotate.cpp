@@ -25,7 +25,7 @@ cLogRotate::~cLogRotate()
 
 void cLogRotate::rotate()
 {
-	std::vector<std::string> files_to_rotate = getFileVector();
+	std::vector<std::string> files_to_rotate = getFileVector(mFileRegex);
 	std::sort(files_to_rotate.begin(), files_to_rotate.end(), [this](const std::string &a, const std::string &b)
 			{
 				return std::stoi(getSuffix(a)) < std::stoi(getSuffix(b));
@@ -37,6 +37,30 @@ void cLogRotate::rotate()
 
 		std::cout << "file " << file << " => " << sfn.prefix << std::stoi(sfn.suffix) + 1 << std::endl;
 	}
+
+	// gz files
+	std::vector<std::string> gz_files_to_rotate = getFileVector(mGZFileRegex);
+	for (auto file : gz_files_to_rotate)
+	{
+		std::cout << "gz file " << file << std::endl;
+	}
+
+	std::sort(gz_files_to_rotate.begin(), gz_files_to_rotate.end(), [this](const std::string &a, const std::string &b)
+			{
+				std::string aSuffix(a);
+				std::string bSuffix(b);
+				aSuffix.erase(aSuffix.end() - 3, aSuffix.end());
+				bSuffix.erase(bSuffix.end() - 3, bSuffix.end());
+				//std::cout << "a " << a << std::endl;
+				std::cout << "aSuffix " << getSuffix(aSuffix) << std::endl;
+				//std::cout << "b " << b << std::endl;
+				std::cout << "bSuffix " << getSuffix(bSuffix) << std::endl;
+				return std::stoi(getSuffix(aSuffix)) < std::stoi(getSuffix(aSuffix));
+			});
+	for (auto file : gz_files_to_rotate)
+	{
+		std::cout << "gz file " << file << std::endl;
+	}
 }
 
 boost::uintmax_t cLogRotate::getFreeSpace()
@@ -45,7 +69,7 @@ boost::uintmax_t cLogRotate::getFreeSpace()
 	return space_inf.available;
 }
 
-std::vector<std::string> cLogRotate::getFileVector()
+std::vector<std::string> cLogRotate::getFileVector(const boost::regex &fileRegex)
 {
 	fs::directory_iterator end_iter;
 	std::string fileName;
@@ -56,7 +80,7 @@ std::vector<std::string> cLogRotate::getFileVector()
 		if (fs::is_regular_file(dir_iter->status()))
 		{
 			fileName = dir_iter->path().c_str();
-			if (boost::regex_match(fileName, mFileRegex))
+			if (boost::regex_match(fileName, fileRegex))
 			{
 				fileVector.emplace_back(std::move(fileName));
 			}

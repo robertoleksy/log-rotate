@@ -24,7 +24,7 @@ public:
 	virtual ~cLogRotate();
 
 	void rotate();
-	std::vector<std::string> getFileVector(); // TODO private
+	std::vector<std::string> getFileVector(const boost::regex &fileRegex); // TODO private
 private:
 	std::vector<std::string> mFileVector;
 	unsigned int mMaxLogFiles;
@@ -33,7 +33,7 @@ private:
 	fs::path mPath;
 	std::chrono::hours mMaxLogStorageTime;
 	const boost::regex mFileRegex; // (...)test.log.1, (...)test.log.2, ... , (...)test.log.n
-	const boost::regex mGZFileRegex;
+	const boost::regex mGZFileRegex; // (...)test.log.1.gz, (...)test.log.2.gz, ... , (...)test.log.n.gz
 
 	boost::uintmax_t getFreeSpace();
 	std::string getSuffix(const std::string &str);
