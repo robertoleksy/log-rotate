@@ -13,7 +13,12 @@
 
 int main()
 {
-	//cLogRotate log_rotate(1000);
+	cLogRotate log_rotate(10, 10);
+	auto vect = log_rotate.getFileVector(std::string(R"(\./test\.log\.\d+)"));
+	for (auto a : vect)
+	{
+		std::cout << a << std::endl;
+	}
 	return 0;
 }
 
