@@ -7,12 +7,20 @@
 
 #include "cLogRotate.h"
 
-cLogRotate::cLogRotate(boost::uintmax_t minDiscFreeSpace, std::string path) {
+cLogRotate::cLogRotate(unsigned int maxLogFiles, unsigned int maxGZFiles, boost::uintmax_t minDiscFreeSpace, std::string path, std::chrono::hours maxLogStorageTime)
+:
+  mMaxLogFiles(maxLogFiles),
+  mMaxGZFiles (maxGZFiles),
+  mMinDiscFreeSpace (minDiscFreeSpace),
+  mPath (path),
+  mMaxLogStorageTime (maxLogStorageTime)
+{
 	// TODO Auto-generated constructor stub
 
 }
 
-cLogRotate::~cLogRotate() {
+cLogRotate::~cLogRotate()
+{
 	// TODO Auto-generated destructor stub
 }
 

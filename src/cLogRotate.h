@@ -18,19 +18,20 @@ namespace fs = boost::filesystem;
 
 class cLogRotate {
 public:
-	cLogRotate(boost::uintmax_t minDiscFreeSpace, std::string path = std::string("."));
+	cLogRotate(unsigned int maxLogFiles, unsigned int maxGZFiles, boost::uintmax_t minDiscFreeSpace = 1000,
+			std::string path = std::string("."), std::chrono::hours maxLogStorageTime = std::chrono::hours(24 * 30));
 	virtual ~cLogRotate();
 
 	void rotate();
 	std::vector<std::string> getFileVector(const std::string &regex_str);
 private:
-	fs::path mPath;
 	std::vector<std::string> mFileVector;
-	boost::uintmax_t mMinDiscFreeSpace;
 	unsigned int mMaxLogFiles;
 	unsigned int mMaxGZFiles;
+	boost::uintmax_t mMinDiscFreeSpace;
+	fs::path mPath;
 	boost::uintmax_t getFreeSpace();
-	//std::chrono::duration<int, std::chrono::hours> mMaxLogStorageTime;
+	std::chrono::hours mMaxLogStorageTime;
 };
 
 #endif /* CLOGROTATE_H_ */

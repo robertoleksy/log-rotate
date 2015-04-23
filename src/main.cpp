@@ -13,8 +13,7 @@
 
 int main()
 {
-
+	//cLogRotate log_rotate(1000);
 	return 0;
 }
 
-//g++  -o "log_rotate" ./src/* -lboost_system -lboost_filesystem -lboost_regex -std=c++11
