@@ -31,11 +31,10 @@ void cLogRotate::rotate()
 				return std::stoi(getSuffix(a)) < std::stoi(getSuffix(b));
 			});
 
-	for (auto file : files_to_rotate) // XXX
+	for (auto file : files_to_rotate)
 	{
 		sFileName sfn = convertName(file);
-
-		std::cout << "file " << file << " => " << sfn.prefix << std::stoi(sfn.suffix) + 1 << std::endl;
+		std::cout << "file " << file << " => " << sfn.prefix << std::stoi(sfn.suffix) + 1 << std::endl; // XXX
 	}
 
 	// gz files
@@ -48,9 +47,11 @@ void cLogRotate::rotate()
 				bSuffix.erase(bSuffix.end() - 3, bSuffix.end());
 				return std::stoi(getSuffix(aSuffix)) < std::stoi(getSuffix(bSuffix));
 			});
-	for (auto file : gz_files_to_rotate)
+	for (auto file : gz_files_to_rotate) // XXX
 	{
-		std::cout << "gz file " << file << std::endl;
+		sFileName sfn = convertName(file);
+		//std::cout << "gz file prefix " << sfn.prefix << " suffix " << sfn.suffix << std::endl; // XXX
+		std::cout << "gz file " << file << " => " << sfn.prefix << std::stoi(sfn.suffix) + 1 << ".gz" << std::endl; // XXX
 	}
 }
 
@@ -97,7 +98,16 @@ std::string cLogRotate::getSuffix(const std::string &str)
 cLogRotate::sFileName cLogRotate::convertName(const std::string &fileName)
 {
 	sFileName sName;
-	sName.suffix = getSuffix(fileName);
-	sName.prefix = fileName.substr(0, fileName.size() - sName.suffix.size());
+	const unsigned int sizeOfFileType = std::string(".gz").size();
+	if (fileName.substr(fileName.size() - sizeOfFileType) == ".gz")
+	{
+		sName.suffix = getSuffix(fileName.substr(0, fileName.size() - sizeOfFileType));
+		sName.prefix = fileName.substr(0, fileName.size() - sName.suffix.size() - sizeOfFileType);
+	}
+	else
+	{
+		sName.suffix = getSuffix(fileName);
+		sName.prefix = fileName.substr(0, fileName.size() - sName.suffix.size());
+	}
 	return sName;
 }
