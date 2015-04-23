@@ -13,7 +13,8 @@ cLogRotate::cLogRotate(unsigned int maxLogFiles, unsigned int maxGZFiles, boost:
   mMaxGZFiles (maxGZFiles),
   mMinDiscFreeSpace (minDiscFreeSpace),
   mPath (path),
-  mMaxLogStorageTime (maxLogStorageTime)
+  mMaxLogStorageTime (maxLogStorageTime),
+  mFileRegex(std::string(R"(.*\.log\.\d+)"))
 {
 }
 
@@ -23,7 +24,7 @@ cLogRotate::~cLogRotate()
 
 void cLogRotate::rotate()
 {
-	std::vector<std::string> files_to_rotate = getFileVector(mRegexFileName);
+	std::vector<std::string> files_to_rotate = getFileVector();
 	std::sort(files_to_rotate.begin(), files_to_rotate.end(), [this](const std::string &a, const std::string &b)
 			{
 				return std::stoi(getSuffix(a)) < std::stoi(getSuffix(b));
@@ -37,20 +38,14 @@ void cLogRotate::rotate()
 	}
 }
 
-void cLogRotate::setFileRegexName(const std::string &regexName)
-{
-	mRegexFileName = regexName;
-}
-
 boost::uintmax_t cLogRotate::getFreeSpace()
 {
 	fs::space_info space_inf = fs::space(mPath);
 	return space_inf.available;
 }
 
-std::vector<std::string> cLogRotate::getFileVector(const std::string &regex_str)
+std::vector<std::string> cLogRotate::getFileVector()
 {
-	boost::regex regex_file(regex_str);
 	fs::directory_iterator end_iter;
 	std::string fileName;
 	std::vector<std::string> fileVector;
@@ -60,7 +55,7 @@ std::vector<std::string> cLogRotate::getFileVector(const std::string &regex_str)
 		if (fs::is_regular_file(dir_iter->status()))
 		{
 			fileName = dir_iter->path().c_str();
-			if (boost::regex_match(fileName, regex_file))
+			if (boost::regex_match(fileName, mFileRegex))
 			{
 				fileVector.emplace_back(std::move(fileName));
 			}
