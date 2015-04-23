@@ -33,6 +33,7 @@ private:
 	fs::path mPath;
 	std::chrono::hours mMaxLogStorageTime;
 	const boost::regex mFileRegex; // (...)test.log.1, (...)test.log.2, ... , (...)test.log.n
+	const boost::regex mGZFileRegex;
 
 	boost::uintmax_t getFreeSpace();
 	std::string getSuffix(const std::string &str);

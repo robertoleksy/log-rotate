@@ -14,7 +14,8 @@ cLogRotate::cLogRotate(unsigned int maxLogFiles, unsigned int maxGZFiles, boost:
   mMinDiscFreeSpace (minDiscFreeSpace),
   mPath (path),
   mMaxLogStorageTime (maxLogStorageTime),
-  mFileRegex(std::string(R"(.*\.log\.\d+)"))
+  mFileRegex(std::string(R"(.*\.log\.\d+)")),
+  mGZFileRegex(std::string(R"(.*\.log\.\d+\.gz)"))
 {
 }
 
