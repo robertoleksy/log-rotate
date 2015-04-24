@@ -18,6 +18,8 @@ cLogRotate::cLogRotate()
   mSleepTime(10 * 60),
   mInstance("test")
 {
+	mFileRegex = boost::regex(std::string(R"(.*)") + mInstance + mLogFileBaseRegex);
+	mGZFileRegex = boost::regex(std::string(R"(.*)") + mInstance + mGZFileBaseRegex);
 }
 
 cLogRotate::cLogRotate(const std::string &confFileName)
