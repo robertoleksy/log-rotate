@@ -14,9 +14,24 @@ cLogRotate::cLogRotate(unsigned int maxLogFiles, unsigned int maxGZFiles, boost:
   mMinDiscFreeSpace (minDiscFreeSpace),
   mPath (path),
   mMaxLogStorageTime (maxLogStorageTime),
-  mFileRegex(std::string(R"(.*\.log\.\d+)")),
+  mFileRegex(std::string(R"(.*\.log\.\d+)")), // TODO init static member
   mGZFileRegex(std::string(R"(.*\.log\.\d+\.gz)"))
 {
+}
+
+cLogRotate::cLogRotate()
+:
+  mMaxLogFiles(5),
+  mMaxGZFiles(10),
+  mMinDiscFreeSpace(10 * 1024 * 1024), // 10MB
+  mPath ("."),
+  mMaxLogStorageTime(std::chrono::hours(24 * 30)),
+  mInstance("test"),
+  mFileRegex(std::string(R"(.*)") + mInstance + mLogFileBaseRegex),
+  mGZFileRegex(std::string(R"(.*)") + mInstance + mGZFileBaseRegex)
+{
+	std::cout << "mFileRegex " << mFileRegex << std::endl;
+	std::cout << "mGZFileRegex " << mGZFileRegex << std::endl;
 }
 
 cLogRotate::~cLogRotate()
@@ -31,8 +46,8 @@ void cLogRotate::rotate()
 			{
 				std::string aSuffix(a);
 				std::string bSuffix(b);
-				aSuffix.erase(aSuffix.end() - 3, aSuffix.end());
-				bSuffix.erase(bSuffix.end() - 3, bSuffix.end());
+				aSuffix.erase(aSuffix.end() - sizeOfFileType, aSuffix.end());
+				bSuffix.erase(bSuffix.end() - sizeOfFileType, bSuffix.end());
 				return std::stoi(getSuffix(aSuffix)) > std::stoi(getSuffix(bSuffix));
 			});
 	for (auto file : gz_files_to_rotate)
@@ -123,3 +138,7 @@ std::chrono::system_clock::time_point cLogRotate::lastWriteTime(const std::strin
 	std::time_t writeTime_t = fs::last_write_time(path);
 	return std::chrono::system_clock::from_time_t(writeTime_t);
 }
+
+
+const std::string cLogRotate::mLogFileBaseRegex = std::string(R"(\.log\.\d+)"); // /path/.../xxx.log.1234
+const std::string cLogRotate::mGZFileBaseRegex = std::string(R"(\.log\.\d+\.gz)"); // /path/.../xxx.log.5678.gz

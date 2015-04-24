@@ -21,6 +21,7 @@ class cLogRotate {
 public:
 	cLogRotate(unsigned int maxLogFiles, unsigned int maxGZFiles, boost::uintmax_t minDiscFreeSpace = 1000,
 			std::string path = std::string("."), std::chrono::hours maxLogStorageTime = std::chrono::hours(24 * 30));
+	cLogRotate();
 	virtual ~cLogRotate();
 
 	void rotate();
@@ -32,12 +33,15 @@ private:
 	boost::uintmax_t mMinDiscFreeSpace;
 	fs::path mPath;
 	std::chrono::hours mMaxLogStorageTime;
-	const boost::regex mFileRegex; // (...).log.1, (...).log.2, ... , (...).log.n
-	const boost::regex mGZFileRegex; // (...).log.1.gz, (...).log.2.gz, ... , (...).log.n.gz
+	std::string mInstance;
+	boost::regex mFileRegex;
+	boost::regex mGZFileRegex;
 	const unsigned int sizeOfFileType = 3; // std::string(".gz").size();
 	boost::uintmax_t getFreeSpace();
 	std::string getSuffix(const std::string &str);
 	//std::string getPrefix(const std::string &str);
+	static const std::string mLogFileBaseRegex;
+	static const std::string mGZFileBaseRegex;
 
 	struct sFileName
 	{
