@@ -35,11 +35,13 @@ void cLogRotate::rotate()
 				bSuffix.erase(bSuffix.end() - 3, bSuffix.end());
 				return std::stoi(getSuffix(aSuffix)) < std::stoi(getSuffix(bSuffix));
 			});
-	for (auto file : gz_files_to_rotate) // XXX
+	for (auto file : gz_files_to_rotate)
 	{
 		sFileName sfn = convertName(file);
 		//std::cout << "gz file prefix " << sfn.prefix << " suffix " << sfn.suffix << std::endl; // XXX
-		std::cout << "gz file " << file << " => " << sfn.prefix << std::stoi(sfn.suffix) + 1 << ".gz" << std::endl; // XXX
+		std::string newName = sfn.prefix + std::to_string(std::stoi(sfn.suffix) + 1) + ".gz";
+		std::cout << "gz file " << file << " => " << newName << std::endl; // XXX
+		fs::rename(file, newName);
 	}
 
 	// normal logs
@@ -52,9 +54,10 @@ void cLogRotate::rotate()
 	for (auto file : files_to_rotate)
 	{
 		sFileName sfn = convertName(file);
-		std::cout << "file " << file << " => " << sfn.prefix << std::stoi(sfn.suffix) + 1 << std::endl; // XXX
+		std::string newName = sfn.prefix + std::to_string(std::stoi(sfn.suffix) + 1);
+		std::cout << "file " << file << " => " << newName << std::endl; // XXX
+		fs::rename(file, newName);
 	}
-
 }
 
 boost::uintmax_t cLogRotate::getFreeSpace()
@@ -100,7 +103,6 @@ std::string cLogRotate::getSuffix(const std::string &str)
 cLogRotate::sFileName cLogRotate::convertName(const std::string &fileName)
 {
 	sFileName sName;
-	const unsigned int sizeOfFileType = std::string(".gz").size();
 	if (fileName.substr(fileName.size() - sizeOfFileType) == ".gz")
 	{
 		sName.suffix = getSuffix(fileName.substr(0, fileName.size() - sizeOfFileType));

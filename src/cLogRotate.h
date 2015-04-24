@@ -32,9 +32,9 @@ private:
 	boost::uintmax_t mMinDiscFreeSpace;
 	fs::path mPath;
 	std::chrono::hours mMaxLogStorageTime;
-	const boost::regex mFileRegex; // (...)test.log.1, (...)test.log.2, ... , (...)test.log.n
-	const boost::regex mGZFileRegex; // (...)test.log.1.gz, (...)test.log.2.gz, ... , (...)test.log.n.gz
-
+	const boost::regex mFileRegex; // (...).log.1, (...).log.2, ... , (...).log.n
+	const boost::regex mGZFileRegex; // (...).log.1.gz, (...).log.2.gz, ... , (...).log.n.gz
+	const unsigned int sizeOfFileType = 3; // std::string(".gz").size();
 	boost::uintmax_t getFreeSpace();
 	std::string getSuffix(const std::string &str);
 	//std::string getPrefix(const std::string &str);
@@ -42,7 +42,7 @@ private:
 	struct sFileName
 	{
 		std::string prefix;
-		std::string suffix;
+		std::string suffix; // last number in path without ".gz"
 	};
 
 	sFileName convertName(const std::string &fileName);
