@@ -7,19 +7,7 @@
 
 #include "cLogRotate.h"
 
-cLogRotate::cLogRotate(unsigned int maxLogFiles, unsigned int maxGZFiles, boost::uintmax_t minDiscFreeSpace, std::string path, std::chrono::hours maxLogStorageTime)
-:
-  mMaxLogFiles(maxLogFiles),
-  mMaxGZFiles (maxGZFiles),
-  mMinDiscFreeSpace (minDiscFreeSpace),
-  mPath (path),
-  mMaxLogStorageTime (maxLogStorageTime),
-  mFileRegex(std::string(R"(.*\.log\.\d+)")), // TODO init static member
-  mGZFileRegex(std::string(R"(.*\.log\.\d+\.gz)"))
-{
-}
-
-cLogRotate::cLogRotate(const std::string &confFileName)
+cLogRotate::cLogRotate()
 :
   mMaxLogFiles(5),
   mMaxGZFiles(10),
@@ -28,12 +16,12 @@ cLogRotate::cLogRotate(const std::string &confFileName)
   mPath ("."),
   mMaxLogStorageTime(std::chrono::hours(24 * 30)),
   mSleepTime(10 * 60),
-  mInstance("test"),
-  mFileRegex(std::string(R"(.*)") + mInstance + mLogFileBaseRegex),
-  mGZFileRegex(std::string(R"(.*)") + mInstance + mGZFileBaseRegex)
+  mInstance("test")
 {
-	std::cout << "mFileRegex " << mFileRegex << std::endl;
-	std::cout << "mGZFileRegex " << mGZFileRegex << std::endl;
+}
+
+cLogRotate::cLogRotate(const std::string &confFileName)
+{
 	mConfigFile.open("test.conf");
 	if (!mConfigFile.is_open())
 	{
@@ -43,6 +31,12 @@ cLogRotate::cLogRotate(const std::string &confFileName)
 	{
 		throw std::runtime_error("Config file parser error");
 	}
+
+	mFileRegex = boost::regex(std::string(R"(.*)") + mInstance + mLogFileBaseRegex);
+	mGZFileRegex = boost::regex(std::string(R"(.*)") + mInstance + mGZFileBaseRegex);
+
+	std::cout << "mFileRegex " << mFileRegex << std::endl;
+	std::cout << "mGZFileRegex " << mGZFileRegex << std::endl;
 }
 
 cLogRotate::~cLogRotate()
