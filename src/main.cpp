@@ -23,6 +23,7 @@ int main()
 	}*/
 
 	cLogRotate lr("test.conf");
+	lr.reduce();
 
 	return 0;
 }

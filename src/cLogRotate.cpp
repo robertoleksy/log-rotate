@@ -175,5 +175,34 @@ bool cLogRotate::parseConfFile()
 	}
 }
 
-const std::string cLogRotate::mLogFileBaseRegex = std::string(R"(\.log\.\d+)"); // /path/.../xxx.log.1234
-const std::string cLogRotate::mGZFileBaseRegex = std::string(R"(\.log\.\d+\.gz)"); // /path/.../xxx.log.5678.gz
+void cLogRotate::reduce()
+{
+	std::vector<std::string> gzFiles = getFileVector(mGZFileRegex);
+	if (gzFiles.empty())
+	{
+		std::vector<std::string> logFiles = getFileVector(mFileRegex);
+		if (logFiles.empty())
+		{
+			return;
+		}
+		std::sort(logFiles.begin(), logFiles.end(), [this](const std::string &a, const std::string &b)
+				{
+					return std::stoi(getSuffix(a)) > std::stoi(getSuffix(b));
+				});
+		fs::remove(logFiles.front());
+		return;
+	}
+	// rm last .gz file
+	std::sort(gzFiles.begin(), gzFiles.end(), [this](const std::string &a, const std::string &b)
+			{
+				std::string aSuffix(a);
+				std::string bSuffix(b);
+				aSuffix.erase(aSuffix.end() - sizeOfFileType, aSuffix.end());
+				bSuffix.erase(bSuffix.end() - sizeOfFileType, bSuffix.end());
+				return std::stoi(getSuffix(aSuffix)) > std::stoi(getSuffix(bSuffix));
+			});
+	fs::remove(gzFiles.front());
+}
+
+const std::string cLogRotate::mLogFileBaseRegex = std::string(R"(\.log\.\d+)"); // /path/.../xyz.log.1234
+const std::string cLogRotate::mGZFileBaseRegex = std::string(R"(\.log\.\d+\.gz)"); // /path/.../xyz.log.5678.gz

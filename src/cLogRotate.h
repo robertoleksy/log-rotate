@@ -26,6 +26,7 @@ public:
 	virtual ~cLogRotate();
 
 	void rotate();
+	void reduce(); // rm last .gz or log file
 private:
 	std::vector<std::string> getFileVector(const boost::regex &fileRegex);
 	std::vector<std::string> mFileVector;
@@ -56,6 +57,7 @@ private:
 	std::chrono::system_clock::time_point lastWriteTime(const std::string &path);
 	std::string getNextValueFromFile();
 	bool parseConfFile();
+	//void reduce(); // rm last .gz or log file
 };
 
 #endif /* CLOGROTATE_H_ */
