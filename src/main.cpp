@@ -22,7 +22,7 @@ int main()
 		std::cout << a << std::endl;
 	}*/
 
-	//cLogRotate lr;
+	cLogRotate lr("test.conf");
 
 	return 0;
 }

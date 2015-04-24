@@ -13,6 +13,7 @@
 #include <chrono>
 #include <algorithm>
 #include <fstream>
+#include <thread>
 #include <boost/filesystem.hpp>
 #include <boost/regex.hpp> // http://stackoverflow.com/questions/13899276/using-regex-under-c11
 
@@ -26,8 +27,8 @@ public:
 	virtual ~cLogRotate();
 
 	void rotate();
-	std::vector<std::string> getFileVector(const boost::regex &fileRegex); // TODO private
 private:
+	std::vector<std::string> getFileVector(const boost::regex &fileRegex);
 	std::vector<std::string> mFileVector;
 	unsigned int mMaxLogFiles;
 	unsigned int mMaxGZFiles;
@@ -55,6 +56,7 @@ private:
 
 	sFileName convertName(const std::string &fileName);
 	std::chrono::system_clock::time_point lastWriteTime(const std::string &path);
+	std::string getNextValueFromFile();
 	bool parseConfFile();
 };
 

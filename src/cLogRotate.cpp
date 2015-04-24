@@ -150,10 +150,33 @@ std::chrono::system_clock::time_point cLogRotate::lastWriteTime(const std::strin
 	return std::chrono::system_clock::from_time_t(writeTime_t);
 }
 
+std::string cLogRotate::getNextValueFromFile()
+{
+	std::string value;
+	mConfigFile >> value;
+	mConfigFile >> value;
+	return value;
+}
+
 bool cLogRotate::parseConfFile()
 {
-	//mConfigFile
-	return true; // TODO
+	try
+	{
+		mMaxLogFiles = std::stoi(getNextValueFromFile());
+		mMaxGZFiles = std::stoi(getNextValueFromFile());
+		mMinDiscFreeSpace = std::stoi(getNextValueFromFile());
+		mMaxLogsSize = std::stoi(getNextValueFromFile());
+		mPath = getNextValueFromFile();
+		mInstance = getNextValueFromFile();
+		mMaxLogStorageTime = std::chrono::hours(std::stoi(getNextValueFromFile()));
+		mSleepTime = std::chrono::seconds(std::stoi(getNextValueFromFile()));
+
+		return true;
+	}
+	catch (...)
+	{
+		return false;
+	}
 }
 
 const std::string cLogRotate::mLogFileBaseRegex = std::string(R"(\.log\.\d+)"); // /path/.../xxx.log.1234
