@@ -40,7 +40,9 @@ void cLogRotate::rotate()
 		sFileName sfn = convertName(file);
 		//std::cout << "gz file prefix " << sfn.prefix << " suffix " << sfn.suffix << std::endl; // XXX
 		std::string newName = sfn.prefix + std::to_string(std::stoi(sfn.suffix) + 1) + ".gz";
-		std::cout << "gz file " << file << " => " << newName << std::endl; // XXX
+		//std::cout << "gz file " << file << " => " << newName << std::endl; // XXX
+		//std::time_t tt = std::chrono::system_clock::to_time_t(lastWriteTime(file)); // XXX
+		//std::cout << "file " << file << " " << std::ctime(&tt) << std::endl; // XXX
 		fs::rename(file, newName);
 	}
 
@@ -114,4 +116,10 @@ cLogRotate::sFileName cLogRotate::convertName(const std::string &fileName)
 		sName.prefix = fileName.substr(0, fileName.size() - sName.suffix.size());
 	}
 	return sName;
+}
+
+std::chrono::system_clock::time_point cLogRotate::lastWriteTime(const std::string &path)
+{
+	std::time_t writeTime_t = fs::last_write_time(path);
+	return std::chrono::system_clock::from_time_t(writeTime_t);
 }

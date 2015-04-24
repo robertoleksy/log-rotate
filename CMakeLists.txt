@@ -13,7 +13,7 @@ endif()
 include_directories( ${Boost_INCLUDE_DIR} )
 
 set(WARNINGS "-Wall -Wextra -Wpointer-arith -Wundef -Wvla -Wwrite-strings -Wno-error=extra -Wno-error=deprecated-declarations -Wno-error=sign-compare -Wno-error=strict-aliasing -Wno-error=type-limits -Wno-unused-parameter -Wno-error=unused-variable -Wno-error=undef -Wno-error=uninitialized")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${WARNINGS} -std=c++11 -pedantic -g3")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${WARNINGS} -std=c++11 -pedantic -g3 -O0")
 
 
 add_executable(log_rotate src/main.cpp src/cLogRotate.cpp src/cLogRotate.h)

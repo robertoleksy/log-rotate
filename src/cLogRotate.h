@@ -46,6 +46,7 @@ private:
 	};
 
 	sFileName convertName(const std::string &fileName);
+	std::chrono::system_clock::time_point lastWriteTime(const std::string &path);
 };
 
 #endif /* CLOGROTATE_H_ */
