@@ -33,7 +33,7 @@ void cLogRotate::rotate()
 				std::string bSuffix(b);
 				aSuffix.erase(aSuffix.end() - 3, aSuffix.end());
 				bSuffix.erase(bSuffix.end() - 3, bSuffix.end());
-				return std::stoi(getSuffix(aSuffix)) < std::stoi(getSuffix(bSuffix));
+				return std::stoi(getSuffix(aSuffix)) > std::stoi(getSuffix(bSuffix));
 			});
 	for (auto file : gz_files_to_rotate)
 	{
@@ -48,7 +48,7 @@ void cLogRotate::rotate()
 	std::vector<std::string> files_to_rotate = getFileVector(mFileRegex);
 	std::sort(files_to_rotate.begin(), files_to_rotate.end(), [this](const std::string &a, const std::string &b)
 			{
-				return std::stoi(getSuffix(a)) < std::stoi(getSuffix(b));
+				return std::stoi(getSuffix(a)) > std::stoi(getSuffix(b));
 			});
 
 	for (auto file : files_to_rotate)
