@@ -12,6 +12,7 @@
 #include <string>
 #include <chrono>
 #include <algorithm>
+#include <fstream>
 #include <boost/filesystem.hpp>
 #include <boost/regex.hpp> // http://stackoverflow.com/questions/13899276/using-regex-under-c11
 
@@ -21,7 +22,7 @@ class cLogRotate {
 public:
 	cLogRotate(unsigned int maxLogFiles, unsigned int maxGZFiles, boost::uintmax_t minDiscFreeSpace = 1000,
 			std::string path = std::string("."), std::chrono::hours maxLogStorageTime = std::chrono::hours(24 * 30));
-	cLogRotate();
+	cLogRotate(const std::string &confFileName);
 	virtual ~cLogRotate();
 
 	void rotate();
@@ -31,8 +32,10 @@ private:
 	unsigned int mMaxLogFiles;
 	unsigned int mMaxGZFiles;
 	boost::uintmax_t mMinDiscFreeSpace;
+	boost::uintmax_t mMaxLogsSize;
 	fs::path mPath;
 	std::chrono::hours mMaxLogStorageTime;
+	std::chrono::seconds mSleepTime;
 	std::string mInstance;
 	boost::regex mFileRegex;
 	boost::regex mGZFileRegex;
@@ -42,6 +45,7 @@ private:
 	//std::string getPrefix(const std::string &str);
 	static const std::string mLogFileBaseRegex;
 	static const std::string mGZFileBaseRegex;
+	std::ifstream mConfigFile;
 
 	struct sFileName
 	{
@@ -51,6 +55,7 @@ private:
 
 	sFileName convertName(const std::string &fileName);
 	std::chrono::system_clock::time_point lastWriteTime(const std::string &path);
+	bool parseConfFile();
 };
 
 #endif /* CLOGROTATE_H_ */

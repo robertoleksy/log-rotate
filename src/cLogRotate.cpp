@@ -19,19 +19,30 @@ cLogRotate::cLogRotate(unsigned int maxLogFiles, unsigned int maxGZFiles, boost:
 {
 }
 
-cLogRotate::cLogRotate()
+cLogRotate::cLogRotate(const std::string &confFileName)
 :
   mMaxLogFiles(5),
   mMaxGZFiles(10),
   mMinDiscFreeSpace(10 * 1024 * 1024), // 10MB
+  mMaxLogsSize(10 * 1024 * 1024),
   mPath ("."),
   mMaxLogStorageTime(std::chrono::hours(24 * 30)),
+  mSleepTime(10 * 60),
   mInstance("test"),
   mFileRegex(std::string(R"(.*)") + mInstance + mLogFileBaseRegex),
   mGZFileRegex(std::string(R"(.*)") + mInstance + mGZFileBaseRegex)
 {
 	std::cout << "mFileRegex " << mFileRegex << std::endl;
 	std::cout << "mGZFileRegex " << mGZFileRegex << std::endl;
+	mConfigFile.open("test.conf");
+	if (!mConfigFile.is_open())
+	{
+		throw std::runtime_error("Config file onen error");
+	}
+	else if (!parseConfFile())
+	{
+		throw std::runtime_error("Config file parser error");
+	}
 }
 
 cLogRotate::~cLogRotate()
@@ -139,6 +150,11 @@ std::chrono::system_clock::time_point cLogRotate::lastWriteTime(const std::strin
 	return std::chrono::system_clock::from_time_t(writeTime_t);
 }
 
+bool cLogRotate::parseConfFile()
+{
+	//mConfigFile
+	return true; // TODO
+}
 
 const std::string cLogRotate::mLogFileBaseRegex = std::string(R"(\.log\.\d+)"); // /path/.../xxx.log.1234
 const std::string cLogRotate::mGZFileBaseRegex = std::string(R"(\.log\.\d+\.gz)"); // /path/.../xxx.log.5678.gz

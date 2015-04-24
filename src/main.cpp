@@ -22,7 +22,7 @@ int main()
 		std::cout << a << std::endl;
 	}*/
 
-	cLogRotate lr;
+	//cLogRotate lr;
 
 	return 0;
 }
