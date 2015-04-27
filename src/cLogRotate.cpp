@@ -74,14 +74,36 @@ void cLogRotate::rotate()
 			{
 				return std::stoi(getSuffix(a)) > std::stoi(getSuffix(b));
 			});
-
+	if (files_to_rotate.size() == mMaxLogFiles)
+	{
+		// TODO
+		std::string gzFilename(files_to_rotate[0]);
+		std::cout << "gzFilename " << gzFilename << std::endl;
+		std::remove(gzFilename.begin(), gzFilename.end(), '\"');
+		std::cout << "gzFilename " << gzFilename << std::endl;
+		while (std::isdigit(gzFilename.back()))
+		{
+			gzFilename.pop_back();
+		}
+		gzFilename += std::to_string(mMaxLogFiles + 1);
+		gzFilename += ".gz";
+		std::cout << "convert " << files_to_rotate[0] << " to gz: " << gzFilename << std::endl;
+		fs::rename(files_to_rotate[0], gzFilename);
+		files_to_rotate.erase(files_to_rotate.begin());
+	}
 	for (auto file : files_to_rotate)
 	{
 		sFileName sfn = convertName(file);
 		std::string newName = sfn.prefix + std::to_string(std::stoi(sfn.suffix) + 1);
-		std::cout << "file " << file << " => " << newName << std::endl; // XXX
+		//std::cout << "file " << file << " => " << newName << std::endl; // XXX
 		fs::rename(file, newName);
 	}
+}
+
+bool cLogRotate::needRotate()
+{
+
+	return true;
 }
 
 boost::uintmax_t cLogRotate::getFreeSpace()
