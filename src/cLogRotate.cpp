@@ -102,9 +102,7 @@ void cLogRotate::rotate()
 
 bool cLogRotate::needRotate()
 {
-	// size of logs
 	std::vector<std::string> normalFilesVector = getFileVector(mFileRegex);
-	std::vector<std::string> gzFilesVector = getFileVector(mGZFileRegex);
 	boost::uintmax_t sizeOfLogs = 0;
 	std::sort(normalFilesVector.begin(), normalFilesVector.end(), [this](const std::string &a, const std::string &b)
 			{
@@ -115,21 +113,16 @@ bool cLogRotate::needRotate()
 		std::cout << file << std::endl;
 		sizeOfLogs += fs::file_size(file);
 	}
-	for (auto file : gzFilesVector)
-	{
-		std::cout << file << std::endl;
-		sizeOfLogs += fs::file_size(file);
-	}
-	std::cout << "size of logs = " << sizeOfLogs << std::endl; // XXX
-	if (sizeOfLogs >= mMaxLogsSize)
-	{
-		return true;
-	}
 
 	// size of log.1
 	std::cout << "size of " << normalFilesVector.back() << " " << fs::file_size(normalFilesVector.back()) << std::endl;
 
 	if (fs::file_size(normalFilesVector.back()) >= mMaxLogsSize)
+	{
+		return true;
+	}
+
+	if (getNumberOfLinesInFile(normalFilesVector.back()) >= mSingleLines)
 	{
 		return true;
 	}
@@ -215,9 +208,11 @@ bool cLogRotate::parseConfFile()
 		mMaxGZFiles = std::stoi(getNextValueFromFile());
 		mMinDiscFreeSpace = std::stoi(getNextValueFromFile());
 		mMaxLogsSize = std::stoi(getNextValueFromFile());
+		mSingleLines = std::stoi(getNextValueFromFile());
+		mSingleTime = std::chrono::seconds(std::stoi(getNextValueFromFile()));
 		mPath = getNextValueFromFile();
 		mInstance = getNextValueFromFile();
-		mMaxLogStorageTime = std::chrono::hours(std::stoi(getNextValueFromFile()));
+		mMaxLogStorageTime = std::chrono::seconds(std::stoi(getNextValueFromFile()));
 		mSleepTime = std::chrono::seconds(std::stoi(getNextValueFromFile()));
 
 		return true;
@@ -255,6 +250,19 @@ void cLogRotate::reduce()
 				return std::stoi(getSuffix(aSuffix)) > std::stoi(getSuffix(bSuffix));
 			});
 	fs::remove(gzFiles.front());
+}
+
+unsigned int cLogRotate::getNumberOfLinesInFile(const std::string &filename)
+{
+	std::string line;
+	std::ifstream inputFile(filename);
+	unsigned int numberOfLines = 0;
+	while (std::getline(inputFile, line))
+	{
+		numberOfLines++;
+	}
+	inputFile.close();
+	return numberOfLines;
 }
 
 const std::string cLogRotate::mLogFileBaseRegex = std::string(R"(\.log\.\d+)"); // /path/.../xyz.log.1234

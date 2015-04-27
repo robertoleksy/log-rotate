@@ -36,7 +36,7 @@ private:
 	boost::uintmax_t mMinDiscFreeSpace;
 	boost::uintmax_t mMaxLogsSize;
 	fs::path mPath;
-	std::chrono::hours mMaxLogStorageTime;
+	std::chrono::seconds mMaxLogStorageTime;
 	std::chrono::seconds mSleepTime;
 	std::string mInstance;
 	boost::regex mFileRegex;
@@ -47,6 +47,8 @@ private:
 	static const std::string mLogFileBaseRegex;
 	static const std::string mGZFileBaseRegex;
 	std::ifstream mConfigFile;
+	unsigned int mSingleLines;
+	std::chrono::seconds mSingleTime;
 
 	struct sFileName
 	{
@@ -59,6 +61,7 @@ private:
 	std::string getNextValueFromFile();
 	bool parseConfFile();
 	void reduce(); // rm last .gz or log file
+	unsigned int getNumberOfLinesInFile(const std::string &filename);
 };
 
 #endif /* CLOGROTATE_H_ */
