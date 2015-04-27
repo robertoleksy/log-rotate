@@ -21,6 +21,17 @@ cLogRotate::cLogRotate()
 {
 	mFileRegex = boost::regex(std::string(R"(.*)") + mInstance + mLogFileBaseRegex);
 	mGZFileRegex = boost::regex(std::string(R"(.*)") + mInstance + mGZFileBaseRegex);
+	mStartThreadMutex.lock();
+	mTickThread.reset(new std::thread([this]()
+			{
+				mStartThreadMutex.lock();
+				std::cout << "start thread" << std::endl;
+				while (mStopThread)
+				{
+					tick();
+					std::this_thread::sleep_for(std::chrono::seconds(5));
+				}
+			}));
 }
 
 cLogRotate::cLogRotate(const std::string &confFileName)
@@ -44,10 +55,28 @@ cLogRotate::cLogRotate(const std::string &confFileName)
 
 	std::cout << "mFileRegex " << mFileRegex << std::endl;
 	std::cout << "mGZFileRegex " << mGZFileRegex << std::endl;
+	mStartThreadMutex.lock();
+	mTickThread.reset(new std::thread([this]()
+			{
+				mStartThreadMutex.lock();
+				std::cout << "start thread" << std::endl;
+				while (mStopThread)
+				{
+					tick();
+					std::this_thread::sleep_for(std::chrono::seconds(5));
+				}
+			}));
 }
 
 cLogRotate::~cLogRotate()
 {
+	mStopThread = false;
+	mTickThread->join();
+}
+
+void cLogRotate::run()
+{
+	mStartThreadMutex.unlock();
 }
 
 void cLogRotate::tick()
