@@ -106,18 +106,32 @@ bool cLogRotate::needRotate()
 	std::vector<std::string> normalFilesVector = getFileVector(mFileRegex);
 	std::vector<std::string> gzFilesVector = getFileVector(mGZFileRegex);
 	boost::uintmax_t sizeOfLogs = 0;
+	std::sort(normalFilesVector.begin(), normalFilesVector.end(), [this](const std::string &a, const std::string &b)
+			{
+				return std::stoi(getSuffix(a)) > std::stoi(getSuffix(b));
+			});
 	for (auto file : normalFilesVector)
 	{
+		std::cout << file << std::endl;
 		sizeOfLogs += fs::file_size(file);
 	}
 	for (auto file : gzFilesVector)
 	{
+		std::cout << file << std::endl;
 		sizeOfLogs += fs::file_size(file);
 	}
 	std::cout << "size of logs = " << sizeOfLogs << std::endl; // XXX
 	if (sizeOfLogs >= mMaxLogsSize)
 	{
-		return false;
+		return true;
+	}
+
+	// size of log.1
+	std::cout << "size of " << normalFilesVector.back() << " " << fs::file_size(normalFilesVector.back()) << std::endl;
+
+	if (fs::file_size(normalFilesVector.back()) >= mMaxLogsSize)
+	{
+		return true;
 	}
 
 	return false;
