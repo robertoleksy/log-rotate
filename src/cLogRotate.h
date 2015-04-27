@@ -20,6 +20,7 @@
 #include <memory>
 #include <boost/filesystem.hpp>
 #include <boost/regex.hpp> // http://stackoverflow.com/questions/13899276/using-regex-under-c11
+#include <zlib.h>
 
 namespace fs = boost::filesystem;
 
@@ -71,6 +72,7 @@ private:
 	void rotate();
 	bool needRotate();
 	bool needReduce();
+	void compressFile(const std::string &fname_in, const std::string &fname_out);
 };
 
 #endif /* CLOGROTATE_H_ */
