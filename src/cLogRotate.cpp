@@ -16,15 +16,18 @@ cLogRotate::cLogRotate()
   mPath ("."),
   mMaxLogStorageTime(std::chrono::hours(24 * 30)),
   mSleepTime(10 * 60),
-  mInstance("test")
+  mInstance("test"),
+  mStopThread(false)
 {
 	mFileRegex = boost::regex(std::string(R"(.*)") + mInstance + mLogFileBaseRegex);
 	mGZFileRegex = boost::regex(std::string(R"(.*)") + mInstance + mGZFileBaseRegex);
 }
 
 cLogRotate::cLogRotate(const std::string &confFileName)
+:
+		mStopThread(false)
 {
-	mConfigFile.open("test.conf");
+	mConfigFile.open(confFileName);
 	if (!mConfigFile.is_open())
 	{
 		throw std::runtime_error("Config file onen error");
@@ -33,6 +36,8 @@ cLogRotate::cLogRotate(const std::string &confFileName)
 	{
 		throw std::runtime_error("Config file parser error");
 	}
+
+	mConfigFile.close();
 
 	mFileRegex = boost::regex(std::string(R"(.*)") + mInstance + mLogFileBaseRegex);
 	mGZFileRegex = boost::regex(std::string(R"(.*)") + mInstance + mGZFileBaseRegex);
@@ -43,6 +48,18 @@ cLogRotate::cLogRotate(const std::string &confFileName)
 
 cLogRotate::~cLogRotate()
 {
+}
+
+void cLogRotate::tick()
+{
+	if (needRotate())
+	{
+		rotate();
+	}
+	if (needReduce())
+	{
+		reduce();
+	}
 }
 
 void cLogRotate::rotate()

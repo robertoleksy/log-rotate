@@ -14,7 +14,10 @@
 #include <algorithm>
 #include <fstream>
 #include <thread>
+#include <atomic>
+#include <mutex>
 #include <cctype>
+#include <memory>
 #include <boost/filesystem.hpp>
 #include <boost/regex.hpp> // http://stackoverflow.com/questions/13899276/using-regex-under-c11
 
@@ -26,9 +29,12 @@ public:
 	cLogRotate(const std::string &confFileName);
 	virtual ~cLogRotate();
 
+	void tick();
 	void rotate();
 	bool needRotate(); // TODO private
 	bool needReduce(); // TODO private
+
+	std::mutex mLogSaveMutex;
 private:
 	std::vector<std::string> getFileVector(const boost::regex &fileRegex); // TODO return std::set?
 	unsigned int mMaxLogFiles;
@@ -49,6 +55,8 @@ private:
 	std::ifstream mConfigFile;
 	unsigned int mSingleLines;
 	std::chrono::seconds mSingleTime;
+	std::unique_ptr<std::thread> mTickThread;
+	std::atomic<bool> mStopThread;
 
 	struct sFileName
 	{
