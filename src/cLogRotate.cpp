@@ -76,7 +76,7 @@ void cLogRotate::rotate()
 			});
 	if (files_to_rotate.size() == mMaxLogFiles)
 	{
-		// TODO
+		// TODO make real .gz file
 		std::string gzFilename(files_to_rotate[0]);
 		std::cout << "gzFilename " << gzFilename << std::endl;
 		std::remove(gzFilename.begin(), gzFilename.end(), '\"');
@@ -102,8 +102,25 @@ void cLogRotate::rotate()
 
 bool cLogRotate::needRotate()
 {
+	// size of logs
+	std::vector<std::string> normalFilesVector = getFileVector(mFileRegex);
+	std::vector<std::string> gzFilesVector = getFileVector(mGZFileRegex);
+	boost::uintmax_t sizeOfLogs = 0;
+	for (auto file : normalFilesVector)
+	{
+		sizeOfLogs += fs::file_size(file);
+	}
+	for (auto file : gzFilesVector)
+	{
+		sizeOfLogs += fs::file_size(file);
+	}
+	std::cout << "size of logs = " << sizeOfLogs << std::endl; // XXX
+	if (sizeOfLogs >= mMaxLogsSize)
+	{
+		return false;
+	}
 
-	return true;
+	return false;
 }
 
 boost::uintmax_t cLogRotate::getFreeSpace()

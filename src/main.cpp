@@ -24,7 +24,7 @@ int main()
 
 	cLogRotate lr("test.conf");
 	//lr.reduce();
-	lr.rotate();
+	lr.needRotate();
 
 	return 0;
 }
