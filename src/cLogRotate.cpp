@@ -100,7 +100,7 @@ void cLogRotate::rotate()
 	}
 }
 
-bool cLogRotate::needRotate()
+bool cLogRotate::needRotate() // TODO time of create file
 {
 	std::vector<std::string> normalFilesVector = getFileVector(mFileRegex);
 	boost::uintmax_t sizeOfLogs = 0;
@@ -110,23 +110,42 @@ bool cLogRotate::needRotate()
 			});
 	for (auto file : normalFilesVector)
 	{
-		std::cout << file << std::endl;
 		sizeOfLogs += fs::file_size(file);
 	}
 
-	// size of log.1
-	std::cout << "size of " << normalFilesVector.back() << " " << fs::file_size(normalFilesVector.back()) << std::endl;
-
+	// size of .log.1
 	if (fs::file_size(normalFilesVector.back()) >= mMaxLogsSize)
 	{
 		return true;
 	}
 
+	// number of line in .log.1
 	if (getNumberOfLinesInFile(normalFilesVector.back()) >= mSingleLines)
 	{
 		return true;
 	}
 
+	return false;
+}
+
+bool cLogRotate::needReduce()
+{
+	std::vector<std::string> filesVector = getFileVector(mFileRegex);
+	std::vector<std::string> gzFilesVector = getFileVector(mGZFileRegex);
+	for (auto file : gzFilesVector)
+	{
+		std::cout << file << std::endl;
+	}
+	std::cout << "free sapce " << getFreeSpace() << std::endl;
+	if (getFreeSpace() <= mMinDiscFreeSpace)
+	{
+		return true;
+	}
+
+	if (gzFilesVector.size() >= mMaxGZFiles)
+	{
+		return true;
+	}
 	return false;
 }
 

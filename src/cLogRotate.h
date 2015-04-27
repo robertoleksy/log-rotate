@@ -27,10 +27,10 @@ public:
 	virtual ~cLogRotate();
 
 	void rotate();
-	bool needRotate();
+	bool needRotate(); // TODO private
+	bool needReduce(); // TODO private
 private:
-	std::vector<std::string> getFileVector(const boost::regex &fileRegex);
-	std::vector<std::string> mFileVector;
+	std::vector<std::string> getFileVector(const boost::regex &fileRegex); // TODO return std::set?
 	unsigned int mMaxLogFiles;
 	unsigned int mMaxGZFiles;
 	boost::uintmax_t mMinDiscFreeSpace;

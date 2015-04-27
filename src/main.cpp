@@ -25,7 +25,8 @@ int main()
 	cLogRotate lr("test.conf");
 	//lr.reduce();
 	lr.needRotate();
-
+	std::cout << "************************************" << std::endl;
+	lr.needReduce();
 	return 0;
 }
 
