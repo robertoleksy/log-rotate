@@ -189,6 +189,11 @@ bool cLogRotate::needRotate() // TODO time of create file
 		return true;
 	}
 
+	if (getDateFromFilename(normalFilesVector.back()) + mSingleTime < std::chrono::system_clock::now())
+	{
+		return true;
+	}
+
 	return false;
 }
 
