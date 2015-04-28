@@ -52,7 +52,7 @@ cLogRotate::cLogRotate(const std::string &confFileName)
 
 	mFileRegex = boost::regex(std::string(R"(.*)") + mInstance + mLogFileBaseRegex);
 	mGZFileRegex = boost::regex(std::string(R"(.*)") + mInstance + mGZFileBaseRegex);
-
+	/*
 	std::cout << "mFileRegex " << mFileRegex << std::endl;
 	std::cout << "mGZFileRegex " << mGZFileRegex << std::endl;
 
@@ -68,6 +68,9 @@ cLogRotate::cLogRotate(const std::string &confFileName)
 		std::cout << a << std::endl;
 	}
 
+	getDateFromFilename(vec[0]);
+	getDateFromFilename(vec2[0]);
+	*/
 	mStartThreadMutex.lock();
 	mTickThread.reset(new std::thread([this]()
 			{
@@ -366,11 +369,36 @@ void cLogRotate::compressFile(const std::string &fname_in, const std::string &fn
 	gzclose(gz_file);
 }
 
-/*std::chrono::time_point cLogRotate::getDateFromFilename(const std::string &filename)
+std::chrono::system_clock::time_point cLogRotate::getDateFromFilename(std::string filename)
 {
+	if (filename.back() == 'z') // *.gz
+	{
+		filename.erase(filename.end() - sizeOfFileType, filename.end());
+	}
 
+	while (filename.back() != '.')
+	{
+		filename.pop_back();
+	}
+	filename.pop_back();
+	while (filename.back() != '.')
+	{
+		filename.pop_back();
+	}
+	filename.pop_back();
+	//std::stringstream ss(filename.substr(filename.size() - 19));
+	/*std::tm tm;
+	ss >> std::get_time(&tm, "%Y.%m.%d-%H.%M.%S");*/
+	//2015.04.27-17.05.00
+	const std::locale format(std::locale::classic(), new boost::posix_time::time_input_facet("%Y.%m.%d-%H.%M.%S"));
+	std::stringstream ss(filename.substr(filename.size() - 19));
+	ss.imbue(format);
+	boost::posix_time::ptime ptime;
+	ss >> ptime;
+	std::tm tm = boost::posix_time::to_tm(ptime);
+	return std::chrono::system_clock::from_time_t(std::mktime(&tm));
 }
-*/
+
 //																	rrrr    MM     dd    hh     mm     ss
 const std::string cLogRotate::mLogFileBaseRegex = 	std::string(R"(\.\d{4}\.\d{2}\.\d{2}-\d{2}\.\d{2}\.\d{2}\.log\.\d+)"); // /path/.../xyz.2000.01.31-12.00.00.log.1234
 const std::string cLogRotate::mGZFileBaseRegex = 	std::string(R"(\.\d{4}\.\d{2}\.\d{2}-\d{2}\.\d{2}\.\d{2}\.log\.\d+\.gz)"); // /path/.../xyz.2000.01.31-12.00.00.log.5678.gz

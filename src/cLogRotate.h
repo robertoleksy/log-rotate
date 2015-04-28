@@ -18,8 +18,12 @@
 #include <mutex>
 #include <cctype>
 #include <memory>
+#include <iomanip>
+#include <sstream>
+#include <ctime>
 #include <boost/filesystem.hpp>
 #include <boost/regex.hpp> // http://stackoverflow.com/questions/13899276/using-regex-under-c11
+#include <boost/date_time.hpp>
 #include <zlib.h>
 
 namespace fs = boost::filesystem;
@@ -73,7 +77,7 @@ private:
 	bool needRotate();
 	bool needReduce();
 	void compressFile(const std::string &fname_in, const std::string &fname_out);
-	//std::chrono::time_point getDateFromFilename(const std::string &filename); // TODO
+	std::chrono::system_clock::time_point getDateFromFilename(std::string filename);
 };
 
 #endif /* CLOGROTATE_H_ */
