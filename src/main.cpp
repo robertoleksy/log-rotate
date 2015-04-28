@@ -15,10 +15,10 @@ int main()
 {
 	cLogRotate lr("test.conf");
 
-	std::this_thread::sleep_for(std::chrono::seconds(3));
-	lr.run();
+//	std::this_thread::sleep_for(std::chrono::seconds(3));
+//	lr.run();
 
-	std::this_thread::sleep_for(std::chrono::seconds(3));
+//	std::this_thread::sleep_for(std::chrono::seconds(3));
 
 	return 0;
 }

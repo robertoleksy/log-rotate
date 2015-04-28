@@ -73,6 +73,7 @@ private:
 	bool needRotate();
 	bool needReduce();
 	void compressFile(const std::string &fname_in, const std::string &fname_out);
+	//std::chrono::time_point getDateFromFilename(const std::string &filename); // TODO
 };
 
 #endif /* CLOGROTATE_H_ */

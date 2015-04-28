@@ -25,7 +25,7 @@ cLogRotate::cLogRotate()
 	mTickThread.reset(new std::thread([this]()
 			{
 				mStartThreadMutex.lock();
-				std::cout << "start thread" << std::endl;
+				std::cout << "start thread" << std::endl; // XXX
 				while (mStopThread)
 				{
 					tick();
@@ -55,11 +55,24 @@ cLogRotate::cLogRotate(const std::string &confFileName)
 
 	std::cout << "mFileRegex " << mFileRegex << std::endl;
 	std::cout << "mGZFileRegex " << mGZFileRegex << std::endl;
+
+	std::vector<std::string> vec = getFileVector(mFileRegex); // XXX
+	for (auto a : vec)
+	{
+		std::cout << a << std::endl;
+	}
+	std::cout << " GZ files" << std::endl;
+	std::vector<std::string> vec2 = getFileVector(mGZFileRegex); // XXX
+	for (auto a : vec2)
+	{
+		std::cout << a << std::endl;
+	}
+
 	mStartThreadMutex.lock();
 	mTickThread.reset(new std::thread([this]()
 			{
 				mStartThreadMutex.lock();
-				std::cout << "start thread" << std::endl;
+				std::cout << "start thread" << std::endl; // XXX
 				while (mStopThread)
 				{
 					tick();
@@ -71,6 +84,7 @@ cLogRotate::cLogRotate(const std::string &confFileName)
 cLogRotate::~cLogRotate()
 {
 	mStopThread = false;
+	mStartThreadMutex.unlock();
 	mTickThread->join();
 }
 
@@ -133,6 +147,7 @@ void cLogRotate::rotate()
 		}
 		gzFilename += std::to_string(mMaxLogFiles + 1);
 		gzFilename += ".gz";
+		compressFile(files_to_rotate[0], gzFilename);
 		std::cout << "convert " << files_to_rotate[0] << " to gz: " << gzFilename << std::endl;
 		fs::rename(files_to_rotate[0], gzFilename);
 		files_to_rotate.erase(files_to_rotate.begin());
@@ -288,7 +303,7 @@ bool cLogRotate::parseConfFile()
 	}
 }
 
-void cLogRotate::reduce()
+void cLogRotate::reduce() // TODO time of creation last file
 {
 	std::vector<std::string> gzFiles = getFileVector(mGZFileRegex);
 	if (gzFiles.empty())
@@ -351,5 +366,11 @@ void cLogRotate::compressFile(const std::string &fname_in, const std::string &fn
 	gzclose(gz_file);
 }
 
-const std::string cLogRotate::mLogFileBaseRegex = std::string(R"(\.log\.\d+)"); // /path/.../xyz.log.1234
-const std::string cLogRotate::mGZFileBaseRegex = std::string(R"(\.log\.\d+\.gz)"); // /path/.../xyz.log.5678.gz
+/*std::chrono::time_point cLogRotate::getDateFromFilename(const std::string &filename)
+{
+
+}
+*/
+//																	rrrr    MM     dd    hh     mm     ss
+const std::string cLogRotate::mLogFileBaseRegex = 	std::string(R"(\.\d{4}\.\d{2}\.\d{2}-\d{2}\.\d{2}\.\d{2}\.log\.\d+)"); // /path/.../xyz.2000.01.31-12.00.00.log.1234
+const std::string cLogRotate::mGZFileBaseRegex = 	std::string(R"(\.\d{4}\.\d{2}\.\d{2}-\d{2}\.\d{2}\.\d{2}\.log\.\d+\.gz)"); // /path/.../xyz.2000.01.31-12.00.00.log.5678.gz
