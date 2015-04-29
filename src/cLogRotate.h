@@ -30,7 +30,6 @@ namespace fs = boost::filesystem;
 
 class cLogRotate {
 public:
-	cLogRotate();
 	cLogRotate(const std::string &confFileName);
 	virtual ~cLogRotate();
 
@@ -59,6 +58,7 @@ private:
 	std::unique_ptr<std::thread> mTickThread;
 	std::atomic<bool> mStopThread;
 	std::mutex mStartThreadMutex;
+	std::stringstream mConfStream;
 
 	struct sFileName
 	{

@@ -7,43 +7,25 @@
 
 #include "cLogRotate.h"
 
-cLogRotate::cLogRotate()
-:
-  mMaxLogFiles(5),
-  mMaxGZFiles(10),
-  mMinDiscFreeSpace(10 * 1024 * 1024), // 10MB
-  mMaxLogsSize(10 * 1024 * 1024),
-  mPath ("."),
-  mMaxLogStorageTime(std::chrono::hours(24 * 30)),
-  mSleepTime(10 * 60),
-  mInstance("test"),
-  mStopThread(false)
-{
-	mFileRegex = boost::regex(std::string(R"(.*)") + mInstance + mLogFileBaseRegex);
-	mGZFileRegex = boost::regex(std::string(R"(.*)") + mInstance + mGZFileBaseRegex);
-	mStartThreadMutex.lock();
-	mTickThread.reset(new std::thread([this]()
-			{
-				mStartThreadMutex.lock();
-				std::cout << "start thread" << std::endl; // XXX
-				while (mStopThread)
-				{
-					tick();
-					std::this_thread::sleep_for(std::chrono::seconds(5));
-				}
-			}));
-}
-
 cLogRotate::cLogRotate(const std::string &confFileName)
 :
 		mStopThread(false)
 {
 	mConfigFile.open(confFileName);
-	if (!mConfigFile.is_open())
+	if (mConfigFile.is_open())
 	{
-		throw std::runtime_error("Config file onen error");
+		std::cout << "start read conf file " << confFileName << std::endl;
+		std::string wordFromFile;
+		while (mConfigFile >> wordFromFile)
+		{
+			mConfStream << wordFromFile << " ";
+		}
 	}
-	else if (!parseConfFile())
+	else
+	{
+		std::cout << "Open file error" << std::endl;
+	}
+	if (!parseConfFile())
 	{
 		throw std::runtime_error("Config file parser error");
 	}
@@ -79,7 +61,7 @@ cLogRotate::cLogRotate(const std::string &confFileName)
 				while (mStopThread)
 				{
 					tick();
-					std::this_thread::sleep_for(std::chrono::seconds(5));
+					std::this_thread::sleep_for(mSleepTime);
 				}
 			}));
 }
@@ -283,8 +265,10 @@ std::chrono::system_clock::time_point cLogRotate::lastWriteTime(const std::strin
 std::string cLogRotate::getNextValueFromFile()
 {
 	std::string value;
-	mConfigFile >> value;
-	mConfigFile >> value;
+	//mConfigFile >> value;
+	//mConfigFile >> value;
+	mConfStream >> value;
+	mConfStream >> value;
 	return value;
 }
 
