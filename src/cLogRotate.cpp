@@ -48,8 +48,8 @@ cLogRotate::cLogRotate(const std::string &confFileName)
 	for (auto a : vec2)
 	{
 		std::cout << a << std::endl;
-	}
-
+	}*/
+	/*
 	getDateFromFilename(vec[0]);
 	getDateFromFilename(vec2[0]);
 	*/
@@ -162,7 +162,7 @@ bool cLogRotate::needRotate() // TODO time of create file
 	}
 
 	// size of .log.1
-	if (fs::file_size(normalFilesVector.back()) >= mMaxLogsSize)
+	if (fs::file_size(normalFilesVector.back()) >= mMaxLogSize)
 	{
 		return true;
 	}
@@ -185,11 +185,8 @@ bool cLogRotate::needReduce()
 {
 	std::vector<std::string> filesVector = getFileVector(mFileRegex);
 	std::vector<std::string> gzFilesVector = getFileVector(mGZFileRegex);
-	/*for (auto file : gzFilesVector)
-	{
-		std::cout << file << std::endl;
-	}*/
-	std::cout << "free sapce " << getFreeSpace() << std::endl;
+
+	//std::cout << "free sapce " << getFreeSpace() << std::endl;
 	if (getFreeSpace() <= mMinDiscFreeSpace)
 	{
 		return true;
@@ -199,6 +196,13 @@ bool cLogRotate::needReduce()
 	{
 		return true;
 	}
+
+	// size of all files
+	if ((getFilesSize(filesVector) + getFilesSize(gzFilesVector)) > mMaxAllLogsSize)
+	{
+		return true;
+	}
+
 	return false;
 }
 
@@ -281,13 +285,14 @@ bool cLogRotate::parseConfFile()
 		mMaxLogFiles = std::stoi(getNextValueFromFile());
 		mMaxGZFiles = std::stoi(getNextValueFromFile());
 		mMinDiscFreeSpace = std::stoi(getNextValueFromFile());
-		mMaxLogsSize = std::stoi(getNextValueFromFile());
+		mMaxLogSize = std::stoi(getNextValueFromFile());
 		mSingleLines = std::stoi(getNextValueFromFile());
 		mSingleTime = std::chrono::seconds(std::stoi(getNextValueFromFile()));
 		mPath = getNextValueFromFile();
 		mInstance = getNextValueFromFile();
 		mMaxLogStorageTime = std::chrono::seconds(std::stoi(getNextValueFromFile()));
 		mSleepTime = std::chrono::seconds(std::stoi(getNextValueFromFile()));
+		mMaxAllLogsSize = std::stoi(getNextValueFromFile());
 
 		return true;
 	}
@@ -388,6 +393,16 @@ std::chrono::system_clock::time_point cLogRotate::getDateFromFilename(std::strin
 	ss >> ptime;
 	std::tm tm = boost::posix_time::to_tm(ptime);
 	return std::chrono::system_clock::from_time_t(std::mktime(&tm));
+}
+
+boost::uintmax_t cLogRotate::getFilesSize(const std::vector<std::string> &fileVector)
+{
+	boost::uintmax_t filesSize = 0;
+	for (auto file : fileVector)
+	{
+		filesSize += fs::file_size(file);
+	}
+	return filesSize;
 }
 
 //																	rrrr    MM     dd    hh     mm     ss

@@ -40,7 +40,8 @@ private:
 	unsigned int mMaxLogFiles;
 	unsigned int mMaxGZFiles;
 	boost::uintmax_t mMinDiscFreeSpace;
-	boost::uintmax_t mMaxLogsSize;
+	boost::uintmax_t mMaxLogSize; // one file
+	boost::uintmax_t mMaxAllLogsSize; // all files (normal + .gz)
 	fs::path mPath;
 	std::chrono::seconds mMaxLogStorageTime;
 	std::chrono::seconds mSleepTime;
@@ -48,8 +49,6 @@ private:
 	boost::regex mFileRegex;
 	boost::regex mGZFileRegex;
 	const unsigned int sizeOfFileType = 3; // std::string(".gz").size();
-	boost::uintmax_t getFreeSpace();
-	std::string getSuffix(const std::string &str);
 	static const std::string mLogFileBaseRegex;
 	static const std::string mGZFileBaseRegex;
 	std::ifstream mConfigFile;
@@ -66,6 +65,8 @@ private:
 		std::string suffix; // last number in path without ".gz"
 	};
 
+	boost::uintmax_t getFreeSpace();
+	std::string getSuffix(const std::string &str);
 	sFileName convertName(const std::string &fileName);
 	std::chrono::system_clock::time_point lastWriteTime(const std::string &path);
 	std::string getNextValueFromFile();
@@ -78,6 +79,7 @@ private:
 	bool needReduce();
 	void compressFile(const std::string &fname_in, const std::string &fname_out);
 	std::chrono::system_clock::time_point getDateFromFilename(std::string filename);
+	boost::uintmax_t getFilesSize(const std::vector<std::string> &fileVector);
 };
 
 #endif /* CLOGROTATE_H_ */
