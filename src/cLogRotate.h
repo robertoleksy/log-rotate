@@ -53,7 +53,7 @@ private:
 	static const std::string mLogFileBaseRegex;
 	static const std::string mGZFileBaseRegex;
 	std::ifstream mConfigFile;
-	unsigned int mSingleLines;
+	unsigned int mSingleLines; // max lines in single file
 	std::chrono::seconds mSingleTime;
 	std::unique_ptr<std::thread> mTickThread;
 	std::atomic<bool> mStopThread;

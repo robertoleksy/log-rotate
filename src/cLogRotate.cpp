@@ -9,7 +9,7 @@
 
 cLogRotate::cLogRotate(const std::string &confFileName)
 :
-		mStopThread(false)
+		mStopThread(true)
 {
 	mConfigFile.open(confFileName);
 	if (mConfigFile.is_open())
@@ -63,6 +63,7 @@ cLogRotate::cLogRotate(const std::string &confFileName)
 					tick();
 					std::this_thread::sleep_for(mSleepTime);
 				}
+				std::cout << "stop thread" << std::endl; // XXX
 			}));
 }
 
@@ -80,6 +81,7 @@ void cLogRotate::run()
 
 void cLogRotate::tick()
 {
+	std::cout << "tick" << std::endl;
 	if (needRotate())
 	{
 		rotate();
@@ -183,10 +185,10 @@ bool cLogRotate::needReduce()
 {
 	std::vector<std::string> filesVector = getFileVector(mFileRegex);
 	std::vector<std::string> gzFilesVector = getFileVector(mGZFileRegex);
-	for (auto file : gzFilesVector)
+	/*for (auto file : gzFilesVector)
 	{
 		std::cout << file << std::endl;
-	}
+	}*/
 	std::cout << "free sapce " << getFreeSpace() << std::endl;
 	if (getFreeSpace() <= mMinDiscFreeSpace)
 	{

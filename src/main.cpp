@@ -16,10 +16,12 @@ int main()
 	cLogRotate lr("test.conf");
 
 //	std::this_thread::sleep_for(std::chrono::seconds(3));
-//	lr.run();
+	lr.run();
 
 //	std::this_thread::sleep_for(std::chrono::seconds(3));
 
+	char a;
+	std::cin >> a;
 	return 0;
 }
 
